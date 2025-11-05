@@ -22,7 +22,8 @@ def search_track_on_tidal(session, track_info: Dict) -> Optional[object]:
     # Try searching with ISRC first (most accurate)
     if track_info.get('isrc'):
         try:
-            results = session.search('track', track_info['isrc'])
+            # Format ISRC search query properly with "isrc:" prefix
+            results = session.search('track', f"isrc:{track_info['isrc']}")
             if results and len(results) > 0:
                 return results[0]
         except Exception:
