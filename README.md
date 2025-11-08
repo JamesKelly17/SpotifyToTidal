@@ -45,16 +45,19 @@ pip install -r requirements.txt
 ### 4. Configure Environment Variables
 
 1. Copy the example environment file:
-   ```bash
+
    cp .env.example .env
-   ```
+
 
 2. Edit the `.env` file and add your credentials:
-   ```
+
+   nano .env
+
+ 
    SPOTIFY_CLIENT_ID=your_spotify_client_id_here
    SPOTIFY_CLIENT_SECRET=your_spotify_client_secret_here
    SPOTIFY_REDIRECT_URI=http://127.0.0.1:8888/callback
-   ```
+
 
 ## Usage
 
