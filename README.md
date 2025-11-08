@@ -21,16 +21,16 @@ A Python tool to transfer your liked songs from Spotify to Tidal.
 ## Setup
 
 ### 1. Clone the Repository
-```bash
+```
 git clone https://github.com/JamesKelly17/SpotifyToTidal.git
 cd spotifyToTidal
 ```
 
 ### 2. Install Dependencies
 
-
+```
 pip install -r requirements.txt
-
+```
 
 ### 3. Set Up Spotify API Credentials
 
@@ -41,7 +41,8 @@ pip install -r requirements.txt
 5. Once created, you'll see your **Client ID** and **Client Secret**
 6. Click "Edit Settings"
 7. Add `http://127.0.0.1:8888/callback` to the Redirect URIs
-8. Click "Save"
+8. Select "Web API"
+9. Click "Save"
 
 ### 4. Configure Environment Variables
 
@@ -60,6 +61,9 @@ pip install -r requirements.txt
    SPOTIFY_CLIENT_ID=your_spotify_client_id_here
    SPOTIFY_CLIENT_SECRET=your_spotify_client_secret_here
    SPOTIFY_REDIRECT_URI=http://127.0.0.1:8888/callback
+
+   TIDAL_USERNAME=your_tidal_username_here
+   TIDAL_PASSWORD=your_tidal_password_here
    ```
 
 
