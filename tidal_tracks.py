@@ -6,6 +6,7 @@ Handles searching for and adding tracks to Tidal
 from tidal_auth import get_tidal_session
 from typing import Dict, List, Optional
 import time
+import tidalapi
 
 
 def search_track_on_tidal(session, track_info: Dict) -> Optional[object]:
@@ -22,24 +23,31 @@ def search_track_on_tidal(session, track_info: Dict) -> Optional[object]:
     # Try searching with ISRC first (most accurate)
     if track_info.get('isrc'):
         try:
-            # Format ISRC search query properly with "isrc:" prefix
-            results = session.search('track', f"isrc:{track_info['isrc']}")
-            if results and len(results) > 0:
-                return results[0]
-        except Exception:
-            pass  # ISRC search failed, continue to other methods
+            # Search using ISRC - specify Track model class
+            results = session.search(f"isrc:{track_info['isrc']}", models=[tidalapi.Track])
+            
+            # Check if we have tracks in the results
+            if results and 'tracks' in results and results['tracks']:
+                return results['tracks'][0]
+        except Exception as e:
+            # ISRC search failed, continue to other methods
+            pass
 
     # Try searching with track name and artist
     query = f"{track_info['name']} {track_info['artists'][0]}"
 
     try:
-        results = session.search('track', query)
-
-        if not results or len(results) == 0:
+        # Search for tracks only - pass the Track class, not a string
+        results = session.search(query, models=[tidalapi.Track], limit=10)
+        
+        # Check if we have tracks in the results
+        if not results or 'tracks' not in results or not results['tracks']:
             return None
 
+        tracks = results['tracks']
+        
         # Try to find the best match
-        for result in results[:5]:  # Check top 5 results
+        for result in tracks[:5]:  # Check top 5 results
             # Check if artist matches
             result_artists = [artist.name.lower() for artist in result.artists]
             spotify_artists = [artist.lower() for artist in track_info['artists']]
@@ -58,7 +66,7 @@ def search_track_on_tidal(session, track_info: Dict) -> Optional[object]:
                 return result
 
         # If no exact match, return the first result
-        return results[0]
+        return tracks[0] if tracks else None
 
     except Exception as e:
         print(f"Error searching for track: {e}")
@@ -77,6 +85,7 @@ def add_track_to_favorites(session, track) -> bool:
         bool: True if successful, False otherwise
     """
     try:
+        # Get user favorites and add the track
         user = session.user
         user.favorites.add_track(track.id)
         return True
@@ -121,7 +130,9 @@ def transfer_tracks(spotify_tracks: List[Dict]) -> Dict[str, int]:
 
         if tidal_track:
             stats['found'] += 1
-            print(f"  ✓ Found on Tidal: {tidal_track.name} by {tidal_track.artist.name}")
+            # Get the main artist name
+            artist_name = tidal_track.artist.name if hasattr(tidal_track, 'artist') else tidal_track.artists[0].name
+            print(f"  ✓ Found on Tidal: {tidal_track.name} by {artist_name}")
 
             # Add to favorites
             if add_track_to_favorites(session, tidal_track):
@@ -172,6 +183,7 @@ if __name__ == "__main__":
     print("Testing track search...")
     result = search_track_on_tidal(session, test_track)
     if result:
-        print(f"Found: {result.name} by {result.artist.name}")
+        artist_name = result.artist.name if hasattr(result, 'artist') else result.artists[0].name
+        print(f"Found: {result.name} by {artist_name}")
     else:
         print("Track not found")
