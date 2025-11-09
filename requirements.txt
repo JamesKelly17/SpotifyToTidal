@@ -1,4 +1,15 @@
-spotipy
-tidalapi
-python-dotenv
-requests
+# Spotify API wrapper
+spotipy>=2.23.0
+
+# Tidal API wrapper
+tidalapi>=0.7.3
+
+# Environment variable management
+python-dotenv>=1.0.0
+
+# HTTP requests
+requests>=2.31.0
+
+# Additional dependencies for enhanced functionality
+urllib3>=2.0.0
+certifi>=2023.0.0
